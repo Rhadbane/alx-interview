@@ -1,63 +1,56 @@
 #!/usr/bin/python3
 """
-The N queens puzzle is the challenge of placing N non-attacking queens on an
-N×N chessboard. Write a program that solves the N queens problem.
+N queens solution - place N non-attacking queens on an NxN chessboard
 """
 import sys
 
 
-def is_safe(board, row, col, n):
-    """
-    Check if a queen can be placed on board[row][col]
-    """
-    # Check this row on left side
-    for j in range(col):
-        if board[row][j] == 1:
+def is_safe(board, row, col):
+    """Check if a queen can be placed on board[row][col]"""
+    # Check row on left side
+    for x in range(col):
+        if board[row][x] == 1:
             return False
 
     # Check upper diagonal on left side
-    for i, j in zip(range(row, -1, -1), range(col, -1, -1)):
-        if board[i][j] == 1:
+    for x, y in zip(range(row, -1, -1),
+                   range(col, -1, -1)):
+        if board[x][y] == 1:
             return False
 
     # Check lower diagonal on left side
-    for i, j in zip(range(row, n, 1), range(col, -1, -1)):
-        if board[i][j] == 1:
+    for x, y in zip(range(row, N, 1),
+                   range(col, -1, -1)):
+        if board[x][y] == 1:
             return False
 
     return True
 
 
-def solve_nqueens(board, col, n, solutions):
-    """
-    Solve N Queen problem using Backtracking
-    """
-    if col >= n:
+def solve_nqueens(board, col):
+    """Solve N queens problem using backtracking"""
+    # Base case: If all queens are placed, return True
+    if col >= N:
         solution = []
-        for i in range(n):
-            for j in range(n):
+        for i in range(N):
+            for j in range(N):
                 if board[i][j] == 1:
                     solution.append([i, j])
-        solutions.append(solution)
+        print(solution)
         return
 
-    for i in range(n):
-        if is_safe(board, i, col, n):
+    # Consider this column and try placing this queen in all rows one by one
+    for i in range(N):
+        if is_safe(board, i, col):
+            # Place this queen in board[i][col]
             board[i][col] = 1
-            solve_nqueens(board, col + 1, n, solutions)
+            
+            # Make recursive call to place rest of the queens
+            solve_nqueens(board, col + 1)
+            
+            # If placing queen in board[i][col] doesn't lead to a solution,
+            # then remove queen from board[i][col]
             board[i][col] = 0
-
-
-def print_solutions(n):
-    """
-    Initialize board and print all solutions
-    """
-    board = [[0 for x in range(n)] for y in range(n)]
-    solutions = []
-    solve_nqueens(board, 0, n, solutions)
-    
-    for solution in solutions:
-        print(solution)
 
 
 if __name__ == "__main__":
@@ -66,13 +59,16 @@ if __name__ == "__main__":
         sys.exit(1)
 
     try:
-        n = int(sys.argv[1])
+        N = int(sys.argv[1])
     except ValueError:
         print("N must be a number")
         sys.exit(1)
 
-    if n < 4:
+    if N < 4:
         print("N must be at least 4")
         sys.exit(1)
 
-    print_solutions(n)
+    # Initialize empty NxN chessboard
+    board = [[0 for x in range(N)] for y in range(N)]
+    
+    solve_nqueens(board, 0)
